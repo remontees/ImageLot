@@ -10,6 +10,7 @@ Dépendances : module Gtk
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from Utils import create_img_chooser
 
 def main_gui():
     """
@@ -23,38 +24,27 @@ def main_gui():
 
     main_grid = Gtk.Grid()
 
+    # Petit message d'accueil :-)
     label_home = Gtk.Label()
     label_home.set_markup('<b><span size="large">Bienvenue sur ImageLot !</span></b>')
     label_home.set_halign(Gtk.Align.START)
     main_grid.attach(label_home, 0, 0, 2, 1)
 
+    # Sélection multiple des fichiers
     label_file = Gtk.Label("Sélectionnez les photos à traiter : ")
     label_file.set_halign(Gtk.Align.START)
     main_grid.attach(label_file, 0, 1, 1, 1)
-
-    dialog = Gtk.FileChooserDialog(("ImageLot - Sélectionnez les photos à traiter"),
-                                   None,
-                                   Gtk.FileChooserAction.OPEN,
-                                   (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-    filter_img = Gtk.FileFilter()
-    filter_img.set_name(("Images (jpg, png et gif)"))
-    filter_img.add_mime_type("image/jpeg")
-    filter_img.add_mime_type("image/png")
-    filter_img.add_mime_type("image/gif")
-    filter_img.add_pattern("*.jpe?g")
-    filter_img.add_pattern("*.png")
-    filter_img.add_pattern("*.gif")
-
-    dialog.add_filter(filter_img)
-    dialog.set_default_response(Gtk.ResponseType.OK)
-    dialog.set_action(Gtk.FileChooserAction.OPEN)
-    dialog.set_select_multiple(True)
-    file_chooser = Gtk.FileChooserButton.new_with_dialog(dialog)
-    file_chooser.set_title("ImageLot - Sélectionnez les photos à traiter")
-
-
+    file_chooser = create_img_chooser("Sélectionnez les photos à traiter par lot", True)
     main_grid.attach(file_chooser, 1, 1, 1, 1)
+
+    # Sélection du fichier à rajouter sur la photo
+    label_watermark = Gtk.Label("Ajouter une image sur les photos : ")
+    main_grid.attach(label_watermark, 0, 2, 1, 1)
+    img_chooser = create_img_chooser("Sélectionner une image à apposer sur chaque photo")
+    main_grid.attach(img_chooser, 1, 2, 1, 1)
+
+    button_save = Gtk.Button(label="Exécuter les actions")
+    main_grid.attach(button_save, 0, 1000, 1, 1)
 
     window.add(main_grid)
 
