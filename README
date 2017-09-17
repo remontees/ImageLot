@@ -1,0 +1,19 @@
+ImageLot, un logiciel de traitement par lots de photos simple
+=============================================================
+
+Dépendances
+-----------
+
+Codé en Python, utilise PIL (Python Image Library) et GTK+3.
+
+
+
+Utilisation
+-----------
+
+Utilisable par interface graphique et permet de faire différentes opérations de traitement par lot sur des photos :
+
+* Redimensionnement
+* Ajout de bordures
+* Ajout de textes
+* Ajout d'images (logos) en watermark
