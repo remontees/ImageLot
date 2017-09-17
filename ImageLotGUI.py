@@ -18,7 +18,7 @@ def main_gui():
     """
     window = Gtk.Window()
     window.set_title("ImageLot - Traitement par lot d'images")
-    window.set_default_size(640,480)
+    window.set_default_size(640, 480)
     window.connect('delete-event', Gtk.main_quit)
 
     box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
