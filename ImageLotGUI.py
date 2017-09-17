@@ -21,24 +21,22 @@ def main_gui():
     window.set_default_size(640, 480)
     window.connect('delete-event', Gtk.main_quit)
 
-    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+    main_grid = Gtk.Grid()
 
     label_home = Gtk.Label()
     label_home.set_markup('<b><span size="large">Bienvenue sur ImageLot !</span></b>')
     label_home.set_halign(Gtk.Align.START)
-    box.pack_start(label_home, True, True, 0)
+    main_grid.attach(label_home, 0, 0, 2, 1)
 
-    sub_box_file = Gtk.Box(spacing=10)
     label_file = Gtk.Label("Sélectionnez les photos à traiter : ")
     label_file.set_halign(Gtk.Align.START)
-    sub_box_file.pack_start(label_file, True, True, 0)
+    main_grid.attach(label_file, 0, 1, 1, 1)
 
     file_chooser = Gtk.FileChooserButton()
     file_chooser.set_title("ImageLot - Sélectionnez les photos à traiter")
-    sub_box_file.pack_start(file_chooser, True, True, 0)
-    box.pack_start(sub_box_file, True, True, 0)
+    main_grid.attach(file_chooser, 1, 1, 1, 1)
 
-    window.add(box)
+    window.add(main_grid)
 
     window.show_all()
     Gtk.main()
