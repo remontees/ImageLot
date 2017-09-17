@@ -3,7 +3,7 @@
 """
 Projet ImageLot
 Module permettant de charger les photos
-Utilise la librairie PIL
+Utilise la librairie Pillow (fork de PIL pour Python3)
 """
 from os.path import basename
 from PIL import Image, ImageFont, ImageDraw
