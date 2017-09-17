@@ -4,7 +4,7 @@ ImageLot, un logiciel de traitement par lots de photos simple
 Dépendances
 -----------
 
-Codé en Python, utilise PIL (Python Image Library) et GTK+3.
+Codé en Python, utilise PIL (Python Imaging Library) et GTK+3.
 
 
 
