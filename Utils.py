@@ -37,11 +37,11 @@ def create_img_chooser(title, multiple=False):
     images
 
     """
-    dialog = Gtk.FileChooserDialog((title,
-                                    None,
-                                    Gtk.FileChooserAction.OPEN,
-                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                     Gtk.STOCK_OPEN, Gtk.ResponseType.OK)))
+    dialog = Gtk.FileChooserDialog(title,
+                                   None,
+                                   Gtk.FileChooserAction.OPEN,
+                                   (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
     filter_img = Gtk.FileFilter()
     filter_img.set_name(("Images (jpg, png et gif)"))
     filter_img.add_mime_type("image/jpeg")
@@ -53,6 +53,8 @@ def create_img_chooser(title, multiple=False):
 
     dialog.add_filter(filter_img)
     dialog.set_select_multiple(multiple)
+    dialog.set_default_response(Gtk.ResponseType.OK)
+    dialog.set_action(Gtk.FileChooserAction.OPEN)
     file_chooser = Gtk.FileChooserButton.new_with_dialog(dialog)
-    file_chooser.set_title("title")
+    file_chooser.set_title(title)
     return file_chooser
