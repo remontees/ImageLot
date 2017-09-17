@@ -5,6 +5,7 @@ Projet ImageLot
 Module permettant de charger les photos
 Utilise la librairie PIL
 """
+from os.path import basename
 from PIL import Image, ImageFont, ImageDraw
 from Utils import calcul_bordure, ouvrir_photo
 
@@ -24,6 +25,7 @@ class Photo:
             coords_image_x = image_ouverte.size[0]
             coords_image_y = image_ouverte.size[1]
             coords_image = (coords_image_x, coords_image_y)
+            self.name = basename(url)
             self.image = Image.new(image_ouverte.mode_couleur, coords_image, "white")
             self.image.paste(image_ouverte, (0, 0, coords_image_x, coords_image_y))
             self.draw = ImageDraw.Draw(self.image)
@@ -91,6 +93,7 @@ class Photo:
 
     def sauvegarder(self):
         """Sauvegarde l'image traitée sur le disque dur
+        TODO: Choisir le dossier de sauvegarde
 
         """
-        self.image.save(self.type_image)
+        self.image.save(self.name)
