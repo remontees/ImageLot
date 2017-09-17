@@ -20,8 +20,8 @@ def ouvrir_photo(url_photo):
     if url_photo:
         with Image.open(url_photo) as image_ouverte:
             # Vérification du format de l'image
-            if image_ouverte.format not in ("JPEG", "PNG", "BMP"):
-                raise TypeError("Le format de l'image doit être en JPEG, PNG ou BMP.")
+            if image_ouverte.format not in ("JPEG", "PNG", "GIF"):
+                raise TypeError("Le format de l'image doit être en JPEG, PNG ou GIF.")
             else:
                 return image_ouverte
     else:

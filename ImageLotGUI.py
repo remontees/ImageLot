@@ -32,8 +32,28 @@ def main_gui():
     label_file.set_halign(Gtk.Align.START)
     main_grid.attach(label_file, 0, 1, 1, 1)
 
-    file_chooser = Gtk.FileChooserButton()
+    dialog = Gtk.FileChooserDialog(("ImageLot - Sélectionnez les photos à traiter"),
+                                   None,
+                                   Gtk.FileChooserAction.OPEN,
+                                   (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+    filter_img = Gtk.FileFilter()
+    filter_img.set_name(("Images (jpg, png et gif)"))
+    filter_img.add_mime_type("image/jpeg")
+    filter_img.add_mime_type("image/png")
+    filter_img.add_mime_type("image/gif")
+    filter_img.add_pattern("*.jpe?g")
+    filter_img.add_pattern("*.png")
+    filter_img.add_pattern("*.gif")
+
+    dialog.add_filter(filter_img)
+    dialog.set_default_response(Gtk.ResponseType.OK)
+    dialog.set_action(Gtk.FileChooserAction.OPEN)
+    dialog.set_select_multiple(True)
+    file_chooser = Gtk.FileChooserButton.new_with_dialog(dialog)
     file_chooser.set_title("ImageLot - Sélectionnez les photos à traiter")
+
+
     main_grid.attach(file_chooser, 1, 1, 1, 1)
 
     window.add(main_grid)
