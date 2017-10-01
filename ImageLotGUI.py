@@ -11,7 +11,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-def main_ImageLotGUI():
+def main_gui():
     """
     Fonction permettant d'initialiser les paramètres de la fenêtre
     """
@@ -100,4 +100,4 @@ def callback_read_files(dialog, response_id):
 
 # Si l'on exécute le fichier, on lance la fonction main_gui
 if __name__ == '__main__':
-    main_ImageLotGUI()
+    main_gui()
