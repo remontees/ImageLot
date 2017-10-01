@@ -30,31 +30,3 @@ def ouvrir_photo(url_photo):
                 return image_ouverte
     else:
         raise IOError("Il faut donner une URL de photo pour instancier l'objet.")
-
-def create_img_chooser(title, multiple=False):
-    """
-    Fonction permettant de générer une fenêtre et un bouton pour sélectionner des
-    images
-
-    """
-    dialog = Gtk.FileChooserDialog(title,
-                                   None,
-                                   Gtk.FileChooserAction.OPEN,
-                                   (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-    filter_img = Gtk.FileFilter()
-    filter_img.set_name(("Images (jpg, png et gif)"))
-    filter_img.add_mime_type("image/jpeg")
-    filter_img.add_mime_type("image/png")
-    filter_img.add_mime_type("image/gif")
-    filter_img.add_pattern("*.jpe?g")
-    filter_img.add_pattern("*.png")
-    filter_img.add_pattern("*.gif")
-
-    dialog.add_filter(filter_img)
-    dialog.set_select_multiple(multiple)
-    dialog.set_default_response(Gtk.ResponseType.OK)
-    dialog.set_action(Gtk.FileChooserAction.OPEN)
-    file_chooser = Gtk.FileChooserButton.new_with_dialog(dialog)
-    file_chooser.set_title(title)
-    return file_chooser
