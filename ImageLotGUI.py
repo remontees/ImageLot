@@ -4,7 +4,7 @@
 Module principal permettant l'implémentation de l'interface graphique
 du programme ImageLot
 
-Dépendances : module Gtk
+Dépendances : librairie Gtk
 
 """
 import gi
