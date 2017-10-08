@@ -46,17 +46,25 @@ def main_gui():
     main_grid.attach(file_chooser, 1, 1, 1, 1)
 
     # Sélection du fichier à rajouter sur la photo
-    label_watermark = Gtk.Label("Ajouter une image sur les photos : ")
-    main_grid.attach(label_watermark, 0, 2, 1, 1)
+    label_watermark_chooser = Gtk.Label("Image à apposer : ")
+    label_watermark_chooser.set_halign(Gtk.Align.START)
+    main_grid.attach(label_watermark_chooser, 0, 3, 1, 1)
 
     watermark_chooser = create_img_chooser("Sélectionner un logo à poser sur chaque photo", window)
-    main_grid.attach(watermark_chooser, 1, 2, 1, 1)
+    main_grid.attach(watermark_chooser, 1, 3, 1, 1)
 
     boxposition = create_position_chooser()
-    main_grid.attach(boxposition, 1, 3, 1, 1)
+    main_grid.attach(boxposition, 1, 4, 1, 1)
 
     label_img_align = Gtk.Label("Alignement de l'image à apposer : ")
-    main_grid.attach(label_img_align, 0, 3, 1, 1)
+    label_img_align.set_halign(Gtk.Align.START)
+    main_grid.attach(label_img_align, 0, 4, 1, 1)
+
+    label_watermark = Gtk.CheckButton.new_with_label('Apposer une image sur les photos')
+    label_watermark.connect('toggled', callback_watermark,\
+    label_watermark_chooser, watermark_chooser, label_img_align, boxposition)
+    label_watermark.set_active(True)
+    main_grid.attach(label_watermark, 0, 2, 1, 1)
 
     button_save = Gtk.Button(label="Exécuter les actions")
     main_grid.attach(button_save, 0, 1000, 1, 1)
@@ -65,6 +73,22 @@ def main_gui():
 
     window.show_all()
     Gtk.main()
+
+def callback_watermark(checkbox, label_watermark, watermark_chooser, label_img_align, boxposition):
+    """
+    Fonction de callback permettant d'afficher/masquer les éléments permettant de choisir
+    le watermark à ajouter
+    """
+    if checkbox.get_active() is False:
+        label_watermark.hide()
+        watermark_chooser.hide()
+        label_img_align.hide()
+        boxposition.hide()
+    else:
+        label_watermark.show()
+        watermark_chooser.show()
+        label_img_align.show()
+        boxposition.show()
 
 # Si l'on exécute le fichier, on lance la fonction main_gui
 if __name__ == '__main__':
