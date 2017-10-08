@@ -7,9 +7,9 @@ et sur l'interface graphique
 
 """
 from PIL import Image
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+# import gi
+# gi.require_version('Gtk', '3.0')
+# from gi.repository import Gtk
 
 def calcul_bordure(longueur_cote, largeur_bordure):
     """Fonction retournant la largeur d'une image avec la bordure ajoutée
