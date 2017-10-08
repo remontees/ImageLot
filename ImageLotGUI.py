@@ -41,14 +41,14 @@ def main_gui():
     label_file.set_halign(Gtk.Align.START)
     main_grid.attach(label_file, 0, 1, 1, 1)
 
-    file_chooser = create_img_chooser("Sélectionnez les photos à traiter par lot", True)
+    file_chooser = create_img_chooser("Sélectionnez les photos à traiter par lot", window, True)
     main_grid.attach(file_chooser, 1, 1, 1, 1)
 
     # Sélection du fichier à rajouter sur la photo
     label_watermark = Gtk.Label("Ajouter une image sur les photos : ")
     main_grid.attach(label_watermark, 0, 2, 1, 1)
 
-    img_chooser = create_img_chooser("Sélectionner une image à apposer sur chaque photo")
+    img_chooser = create_img_chooser("Sélectionner une image à apposer sur chaque photo", window)
     main_grid.attach(img_chooser, 1, 2, 1, 1)
 
     button_save = Gtk.Button(label="Exécuter les actions")
@@ -59,7 +59,7 @@ def main_gui():
     window.show_all()
     Gtk.main()
 
-def create_img_chooser(title, multiple=False):
+def create_img_chooser(title, window, multiple=False):
     """
     Fonction permettant de générer une fenêtre et un bouton pour sélectionner des
     images
@@ -83,7 +83,18 @@ def create_img_chooser(title, multiple=False):
     dialog.set_select_multiple(multiple)
     dialog.set_default_response(Gtk.ResponseType.OK)
     dialog.set_action(Gtk.FileChooserAction.OPEN)
-    dialog.connect("response", callback_read_files)
+    # On regarde si les fichiers ont bien été trouvés
+    try:
+        dialog.connect("response", callback_read_files)
+    except IOError as error:
+        messagedialog = Gtk.MessageDialog(window,
+                                          flags=Gtk.DialogFlags.MODAL,
+                                          type=Gtk.MessageType.WARNING,
+                                          buttons=Gtk.ButtonsType.OK_CANCEL,
+                                          message_format=error.strerror)
+        messagedialog.connect("response", callback_dialog_close)
+        messagedialog.show()
+
     file_chooser = Gtk.FileChooserButton.new_with_dialog(dialog)
     file_chooser.set_title(title)
     return file_chooser
@@ -93,10 +104,18 @@ def callback_read_files(dialog, response_id):
     Fonction de callback sur le chargement des fichiers
     """
     if response_id == Gtk.ResponseType.OK:
-        print(dialog.get_filenames())
+        return dialog.get_filenames()
     elif response_id == Gtk.ResponseType.CANCEL:
-        print("cancelled: FileChooserAction.OPEN")
+        raise IOError("cancelled: FileChooserAction.OPEN")
 
+def callback_dialog_close(widget, response_id):
+    """
+    Fonction de callback permettant de fermer les boîtes de dialogue
+    """
+    if response_id == Gtk.ResponseType.OK:
+        widget.destroy()
+    else:
+        raise SystemError("Une erreur inconnue est survenue.")
 
 # Si l'on exécute le fichier, on lance la fonction main_gui
 if __name__ == '__main__':
