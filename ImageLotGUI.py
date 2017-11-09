@@ -46,21 +46,22 @@ def main_gui():
     main_grid.attach(file_chooser, 1, 1, 1, 1)
 
     # Sélection du fichier à rajouter sur la photo
-    label_watermark_chooser = Gtk.Label("Image à apposer : ")
+    label_watermark_chooser = Gtk.Label("Texte du copyright : ")
     label_watermark_chooser.set_halign(Gtk.Align.START)
     main_grid.attach(label_watermark_chooser, 0, 3, 1, 1)
 
-    watermark_chooser = create_img_chooser("Sélectionner un logo à poser sur chaque photo", window)
+    watermark_chooser = create_img_chooser("Texte du copyright", window)
     main_grid.attach(watermark_chooser, 1, 3, 1, 1)
+
 
     boxposition = create_position_chooser()
     main_grid.attach(boxposition, 1, 4, 1, 1)
 
-    label_align = Gtk.Label("Alignement de l'image/texte à apposer : ")
+    label_align = Gtk.Label("Alignement du copyright sur la photo : ")
     label_align.set_halign(Gtk.Align.START)
     main_grid.attach(label_align, 0, 4, 1, 1)
 
-    label_watermark = Gtk.CheckButton.new_with_label('Apposer une image sur les photos')
+    label_watermark = Gtk.CheckButton.new_with_label('Ajouter un copyright texte sur les photos : ')
     label_watermark.connect('toggled', callback_watermark,\
     label_watermark_chooser, watermark_chooser, label_align, boxposition)
     label_watermark.set_active(True)
