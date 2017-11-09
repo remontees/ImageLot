@@ -56,13 +56,13 @@ def main_gui():
     boxposition = create_position_chooser()
     main_grid.attach(boxposition, 1, 4, 1, 1)
 
-    label_img_align = Gtk.Label("Alignement de l'image à apposer : ")
-    label_img_align.set_halign(Gtk.Align.START)
-    main_grid.attach(label_img_align, 0, 4, 1, 1)
+    label_align = Gtk.Label("Alignement de l'image/texte à apposer : ")
+    label_align.set_halign(Gtk.Align.START)
+    main_grid.attach(label_align, 0, 4, 1, 1)
 
     label_watermark = Gtk.CheckButton.new_with_label('Apposer une image sur les photos')
     label_watermark.connect('toggled', callback_watermark,\
-    label_watermark_chooser, watermark_chooser, label_img_align, boxposition)
+    label_watermark_chooser, watermark_chooser, label_align, boxposition)
     label_watermark.set_active(True)
     main_grid.attach(label_watermark, 0, 2, 1, 1)
 
