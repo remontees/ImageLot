@@ -11,43 +11,59 @@ from Utils import calcul_bordure, ouvrir_photo
 
 class Photo:
     """ Classe permettant de manipuler une photo.
-    Requiert l'utilisation du module PIL
+    Requiert l'utilisation du module Pillow
 
     """
-    def __init__(self, url):
+    def __init__(self, url_photo):
         """ Constructeur de la classe Photo
-        Assure le chargement correct de la photo par PIL
+        Assure le chargement correct de la photo par Pillow
 
         """
-        if url:
-            image_ouverte = ouvrir_photo(url)
+        with Image.open(url_photo) as image_ouverte:
+            # Vérification du format de l'image
+            if image_ouverte.format not in ("JPEG", "PNG", "GIF"):
+                raise TypeError("Le format de l'image doit être en JPEG, PNG ou GIF.")
+
             # On copie la photo pour ne pas détériorer l'image originale
             coords_image_x = image_ouverte.size[0]
             coords_image_y = image_ouverte.size[1]
             coords_image = (coords_image_x, coords_image_y)
-            self.name = basename(url)
-            self.image = Image.new(image_ouverte.mode_couleur, coords_image, "white")
+            self.name = basename(url_photo)
+            self.image = Image.new(image_ouverte.mode, coords_image, "white")
             self.image.paste(image_ouverte, (0, 0, coords_image_x, coords_image_y))
             self.draw = ImageDraw.Draw(self.image)
+
+            # ATTENTION : On ferme l'image avant la fin de la construction de l'objet /!\
+            image_ouverte.close()
             del image_ouverte
+
+            # On ajoute les paramètres de taille de l'image à l'objet
             self.largeur = coords_image_x
             self.hauteur = coords_image_y
             # On passe uniquement par l'objet maintenant
             self.mode_couleur = self.image.mode
-            self.type_image = self.image.type
-        else:
-            raise IOError("Il faut donner une URL de photo pour instancier l'objet.")
+            self.type_image = self.image.format
 
     def __del__(self):
         """Destruction de l'image lorsque l'objet est détruit afin d'éviter
         de garder des accès au disque dur.
 
         """
-        del self.draw
         try:
-            self.image.close()
+            try:
+                if self.image and self.draw:
+                    self.image.close()
+                    del self.draw
+            except AttributeError:
+                print("L'image n'a pas été ouverte, donc l'image n'a pas été fermée.")
         except:
-            raise GeneratorExit("La photo courante n'a pas pu être refermé correctement.")
+            raise GeneratorExit("La photo courante n'a pas pu être refermée correctement.")
+
+    def __str__(self):
+        """Fonction permettant de transformer l'image en chaine de caractères compréhensible
+
+        """
+        return self.name if self.name else None
 
     # Méthodes de manipulation des images
     def ajouter_bordure(self, epaisseur, couleur):
@@ -97,3 +113,7 @@ class Photo:
 
         """
         self.image.save(self.name)
+
+if __name__ == '__main__':
+    print(Photo(None))
+    print(Photo('test.jpg'))
