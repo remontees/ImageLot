@@ -11,7 +11,8 @@ Codé en Python, utilise Pillow (Python Imaging Library maintenu pour Python3) e
 Utilisation
 -----------
 
-Utilisable par interface graphique et permet de faire différentes opérations de traitement par lot sur des photos :
+EN COURS DE DEVELOPPEMENT
+Permettra par ligne de commande (puis interface graphique)Follow snake_case Follow snake_case  de faire différentes opérations de traitement par lot sur des photos :
 
 * Redimensionnement
 * Ajout de bordures
