@@ -33,6 +33,9 @@ def main_cli():
                         help="Répertoire de destination.")
     args = parser.parse_args()
 
+    # Sanitize destination directory link (from the ending "/")
+    args.dest.strip("/")
+
     # Vérifications des paramètres
     if args.parameters.split('.')[-1] != "json" and \
         args.parameters.split('.')[-1] != "JSON" and \

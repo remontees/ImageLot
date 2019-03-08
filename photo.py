@@ -14,7 +14,7 @@ class Photo:
     Requiert l'utilisation du module Pillow
 
     """
-    def __init__(self, url_photo):
+    def __init__(self, url_photo, destination):
         """ Constructeur de la classe Photo
         Assure le chargement correct de la photo par Pillow
 
@@ -32,6 +32,7 @@ class Photo:
             self.image = Image.new(image_ouverte.mode, coords_image, "white")
             self.image.paste(image_ouverte, (0, 0, coords_image_x, coords_image_y))
             self.draw = ImageDraw.Draw(self.image)
+            self.destination = destination
 
             # ATTENTION : On ferme l'image avant la fin de la construction de l'objet /!\
             image_ouverte.close()
@@ -103,16 +104,21 @@ class Photo:
     # S'exécute uniquement en première fonction de traitement
     def redimensionner(self, largeur, hauteur):
         """Redimensionne une photo suivant les tailles données en paramètre
+        tout en conservant le ratio de l'image d'origine
 
         """
+        # On vérifie si les tailles fournies sont valides !!!
         assert isinstance(largeur, int) is False
         assert isinstance(hauteur, int) is False
+
+        # Gestion du ratio
+        # TODO
 
         self.image = self.image.resize((largeur, hauteur))
 
     def sauvegarder(self):
         """Sauvegarde l'image traitée sur le disque dur
-        TODO: Choisir le dossier de sauvegarde
 
         """
-        self.image.save(self.name)
+        self.image.save(self.destination + "/" + self.name)
+        print("{} : fait.", {self.name})
