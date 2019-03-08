@@ -7,7 +7,7 @@ Utilise la librairie Pillow (fork de PIL pour Python3)
 """
 from os.path import basename
 from PIL import Image, ImageFont, ImageDraw
-from Utils import calcul_bordure
+from utils import calcul_bordure
 
 class Photo:
     """ Classe permettant de manipuler une photo.
