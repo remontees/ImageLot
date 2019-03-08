@@ -8,6 +8,7 @@ Dépendances : argparse, os
 """
 import argparse
 import os
+from imagelot_process import process_json, batch_processing
 
 def main_cli():
     """
@@ -25,7 +26,7 @@ def main_cli():
                         required=True,
                         help="Fichier de paramètres de traitement par lot au format JSON.")
     parser.add_argument("-d",
-                        "--directory",
+                        "--dest",
                         nargs="?",
                         default=None,
                         help="Répertoire de destination.")
@@ -39,6 +40,10 @@ def main_cli():
 
     if not os.path.isdir(args.directory):
         raise IOError("Le répertoire de destination spécifié n'est pas valide.")
+
+    parameters = process_json(args.parameters)
+    batch_processing(args.f, parameters, args.dest)
+
 
 # Si l'on exécute le fichier, on lance la fonction main_gui
 if __name__ == '__main__':
