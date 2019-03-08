@@ -7,6 +7,7 @@ Dépendances externes : json, sys
 """
 import json
 import sys
+from photo import Photo
 
 def process_json(json_file):
     """
@@ -22,4 +23,9 @@ def process_json(json_file):
     return parameters
 
 def batch_processing(files, parameters, dest):
-    "Fonction assurant le traitement par lot"
+    """
+    Fonction assurant le traitement par lot
+    """
+    for url_photo in files:
+        file = Photo(url_photo)
+        # traitement photo

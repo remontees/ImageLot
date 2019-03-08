@@ -11,7 +11,7 @@ La version par interface graphique utilisant GTK+3 est pour le moment abandonné
 
 
 Fonctionnalités
------------
+---------------
 
 EN COURS DE DEVELOPPEMENT
 
@@ -53,6 +53,26 @@ Les opérations à effectuer sur le lot d'images sont à spécifier dans un fich
     "border": {
         "color": "black",
         "width": 3
+    },
+    "copyright": {
+        "text": "© 2019 - remontees",
+        "font": "Ubuntu",
+        "coords": [0, 0],
+        "color": "black"
     }
 }
 ```
+
+Tests
+-----
+
+J'ai pour le moment écrit quelques tests pour la classe `Photo` du module `photo`.
+Les tests peuvent être exécutés avec `pytest-3` en utilisant la commande suivante à la racine du projet :
+```bash
+pytest-3 test_*.py
+```
+Pour obtenir la couverture des tests, vous pouvez utiliser `pytest-cov` à la racine du projet comme suit :
+```bash
+pytest-3 --cov=. --cov-report html test_*.py
+```
+Celui-ci génère un rapport `html` à l'adresse relative `htmlcov/index.html` par rapport à la racine du projet.

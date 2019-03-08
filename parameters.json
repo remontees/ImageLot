@@ -3,5 +3,11 @@
     "border": {
         "color": "black",
         "width": 3
+    },
+    "copyright": {
+        "text": "© 2019 - remontees",
+        "font": "Ubuntu",
+        "coords": [0, 0],
+        "color": "black"
     }
 }
