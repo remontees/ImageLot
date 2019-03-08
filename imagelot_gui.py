@@ -7,11 +7,11 @@ du programme ImageLot
 Dépendances : librairie Gtk
 
 """
+from gi.repository import Gtk
+from gui_utils import create_img_chooser, create_position_chooser
 from datetime import datetime
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-from GUIUtils import create_img_chooser, create_position_chooser
 
 def main_gui():
     """
