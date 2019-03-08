@@ -3,10 +3,10 @@
 """
 Module principal permettant la lecture des paramètres et le traitement par lot
 
-Dépendances externes : json, sys
 """
 import json
 import sys
+import threading
 from photo import Photo
 
 def process_json(json_file):
@@ -22,14 +22,30 @@ def process_json(json_file):
 
     return parameters
 
+def traitement(url_photo, parameters, dest):
+    """
+    Fonction assurant le traitement pour une photo
+    """
+    file = Photo(url_photo, dest)
+    # traitement photo
+    if "size" in parameters:
+        file.redimensionner(*parameters["size"])
+
+    file.sauvegarder()
+
 def batch_processing(files, parameters, dest):
     """
-    Fonction assurant le traitement par lot
+    Fonction assurant le traitement par lot en parallèle !!
     """
-    for url_photo in files:
-        file = Photo(url_photo, dest)
-        # traitement photo
-        if "size" in parameters:
-            file.redimensionner(*parameters["size"])
+    threads = [threading.Thread(target=traitement(url_photo, parameters, dest)) \
+               for url_photo in files]
 
-        file.sauvegarder()
+    # On lance nos threads en parallèle
+    for thread in threads:
+        thread.start()
+
+    # On attend qu'ils terminent
+    for thread in threads:
+        thread.join()
+
+    print("\nTraitement par lot terminé !")

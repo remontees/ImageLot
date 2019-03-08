@@ -6,6 +6,7 @@ Module permettant de charger les photos
 Utilise la librairie Pillow (fork de PIL pour Python3)
 """
 from os.path import basename
+import sys
 from PIL import Image, ImageFont, ImageDraw
 from utils import calcul_bordure
 
@@ -21,7 +22,7 @@ class Photo:
         """
         with Image.open(url_photo) as image_ouverte:
             # Vérification du format de l'image
-            if image_ouverte.format not in ("JPEG", "PNG", "GIF"):
+            if image_ouverte.format not in ("JPEG", "PNG", "GIF", "MPO"):
                 raise TypeError("Le format de l'image doit être en JPEG, PNG ou GIF.")
 
             # On copie la photo pour ne pas détériorer l'image originale
@@ -55,7 +56,8 @@ class Photo:
                     self.image.close()
                     del self.draw
             except AttributeError:
-                print("L'image n'a pas été ouverte, donc l'image n'a pas été fermée.")
+                sys.stderr.write("L'image n'a pas pu être fermée car elle n'a pas été ouverte.\n")
+                sys.exit(1)
         except:
             raise GeneratorExit("La photo courante n'a pas pu être refermée correctement.")
 
@@ -109,7 +111,6 @@ class Photo:
         # On vérifie si les tailles fournies sont valides !!!
         assert isinstance(largeur, int) is True
         assert isinstance(hauteur, int) is True
-        print((largeur, hauteur))
 
         # Gestion du ratio
         ratio = self.taille[0] / self.taille[1]
