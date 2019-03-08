@@ -7,7 +7,7 @@ Utilise la librairie Pillow (fork de PIL pour Python3)
 """
 from os.path import basename
 from PIL import Image, ImageFont, ImageDraw
-from Utils import calcul_bordure, ouvrir_photo
+from Utils import calcul_bordure
 
 class Photo:
     """ Classe permettant de manipuler une photo.
@@ -94,10 +94,13 @@ class Photo:
 
         """
         coord_x, coord_y = coords
-        logo = ouvrir_photo(logo_watermark)
-        self.image.paste(logo, (0, 0, coord_x, coord_y))
+        with Image.open(logo_watermark) as image_ouverte:
+            # Vérification du format de l'image
+            if image_ouverte.format not in ("JPEG", "PNG", "GIF"):
+                raise TypeError("Le format de l'image doit être en JPEG, PNG ou GIF.")
+            self.image.paste(logo_watermark, (0, 0, coord_x, coord_y))
 
-        # S'exécute uniquement en première fonction de traitement
+    # S'exécute uniquement en première fonction de traitement
     def redimensionner(self, largeur, hauteur):
         """Redimensionne une photo suivant les tailles données en paramètre
 

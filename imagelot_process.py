@@ -3,12 +3,22 @@
 """
 Module principal permettant la lecture des paramètres et le traitement par lot
 
+Dépendances externes : json, sys
 """
+import json
+import sys
+
 def process_json(json_file):
     """
     Fonction assurant la lecture des paramètres de traitement par lot JSON.
     """
-    parameters = []
+    try:
+        parameters = json.loads(json_file)
+    except json.JSONDecodeError:
+        sys.stderr.write("Impossible d'extraire les paramètres\
+         du fichier {}.\n".format(json_file.name))
+        sys.exit(1)
+
     return parameters
 
 def batch_processing(files, parameters, dest):

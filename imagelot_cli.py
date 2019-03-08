@@ -3,11 +3,12 @@
 """
 Module principal permettant l'utilisation d'ImageLot en CLI
 
-Dépendances : argparse, os
+Dépendances externes : argparse, os, sys
 
 """
 import argparse
 import os
+import sys
 from imagelot_process import process_json, batch_processing
 
 def main_cli():
@@ -36,12 +37,21 @@ def main_cli():
     if args.parameters.split('.')[-1] != "json" and \
         args.parameters.split('.')[-1] != "JSON" and \
         not os.path.isfile(args.parameters):
-        raise IOError("Les paramètres doivent être spécifiés au format JSON.")
+        sys.stderr.write("Le fichier de paramètres n'est pas au format JSON.\n")
+        sys.exit(1)
 
-    if not os.path.isdir(args.directory):
-        raise IOError("Le répertoire de destination spécifié n'est pas valide.")
+    if not os.path.isdir(args.dest):
+        sys.stderr.write("Le répertoire de destination spécifié n'est pas valide.\n")
+        sys.exit(1)
 
-    parameters = process_json(args.parameters)
+    # On ouvre le fichier des paramèrtes puis on lance le traitement par lot
+    try:
+        parameters_file = open(args.parameters, 'r')
+    except IOError:
+        sys.stderr.write("Impossible d'ouvrir le fichier {} en lecture.\n".format(args.parameters))
+        sys.exit(1)
+
+    parameters = process_json(parameters_file)
     batch_processing(args.f, parameters, args.dest)
 
 
