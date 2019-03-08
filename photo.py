@@ -75,8 +75,8 @@ class Photo:
         nouvelle_largeur = calcul_bordure(self.taille[0], epaisseur)
         nouvelle_hauteur = calcul_bordure(self.taille[1], epaisseur)
 
-        new_image = Image.new(self.mode_couleur, (nouvelle_largeur, nouvelle_hauteur, couleur))
-        new_image.paste(self.image, (epaisseur, couleur))
+        new_image = Image.new(self.mode_couleur, (nouvelle_largeur, nouvelle_hauteur), couleur)
+        new_image.paste(self.image, (epaisseur, epaisseur))
         self.image = new_image
 
     def ajouter_texte(self, texte, font, coords, couleur):
@@ -115,10 +115,15 @@ class Photo:
         # Gestion du ratio
         ratio = self.taille[0] / self.taille[1]
 
-        if largeur >= hauteur:
-            hauteur = int(largeur/ratio)
-        else:
+        print(self.taille, self)
+
+        if self.taille[1] > self.taille[0]:
             largeur = int(hauteur*ratio)
+        else:
+            hauteur = int(largeur/ratio)
+
+        self.taille = [largeur, hauteur]
+
 
         self.image = self.image.resize((largeur, hauteur), resample=Image.LANCZOS)
 

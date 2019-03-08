@@ -31,6 +31,10 @@ def traitement(url_photo, parameters, dest):
     if "size" in parameters:
         file.redimensionner(*parameters["size"])
 
+    if "border" in parameters and "width" in parameters["border"] \
+        and "color" in parameters["border"]:
+        file.ajouter_bordure(parameters["border"]["width"], parameters["border"]["color"])
+
     file.sauvegarder()
 
 def batch_processing(files, parameters, dest):
