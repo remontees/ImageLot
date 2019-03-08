@@ -66,7 +66,7 @@ Les opérations à effectuer sur le lot d'images sont à spécifier dans un fich
 Tests
 -----
 
-J'ai pour le moment écrit quelques tests pour la classe `Photo` du module `photo`.
+J'ai pour le moment écrit quelques tests pour les modules `photo` et `utils`.
 Les tests peuvent être exécutés avec `pytest-3` en utilisant la commande suivante à la racine du projet :
 ```bash
 pytest-3 test_*.py
