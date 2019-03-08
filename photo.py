@@ -39,8 +39,7 @@ class Photo:
             del image_ouverte
 
             # On ajoute les paramètres de taille de l'image à l'objet
-            self.largeur = coords_image_x
-            self.hauteur = coords_image_y
+            self.taille = [coords_image_x, coords_image_y]
             # On passe uniquement par l'objet maintenant
             self.mode_couleur = self.image.mode
             self.type_image = self.image.format
@@ -71,8 +70,8 @@ class Photo:
         """Ajoute une bordure colorée de l'épaisseur choisie à l'image courante.
 
         """
-        nouvelle_largeur = calcul_bordure(self.largeur, epaisseur)
-        nouvelle_hauteur = calcul_bordure(self.hauteur, epaisseur)
+        nouvelle_largeur = calcul_bordure(self.taille[0], epaisseur)
+        nouvelle_hauteur = calcul_bordure(self.taille[1], epaisseur)
 
         new_image = Image.new(self.mode_couleur, (nouvelle_largeur, nouvelle_hauteur, couleur))
         new_image.paste(self.image, (epaisseur, couleur))
@@ -108,17 +107,23 @@ class Photo:
 
         """
         # On vérifie si les tailles fournies sont valides !!!
-        assert isinstance(largeur, int) is False
-        assert isinstance(hauteur, int) is False
+        assert isinstance(largeur, int) is True
+        assert isinstance(hauteur, int) is True
+        print((largeur, hauteur))
 
         # Gestion du ratio
-        # TODO
+        ratio = self.taille[0] / self.taille[1]
 
-        self.image = self.image.resize((largeur, hauteur))
+        if largeur >= hauteur:
+            hauteur = int(largeur/ratio)
+        else:
+            largeur = int(hauteur*ratio)
+
+        self.image = self.image.resize((largeur, hauteur), resample=Image.LANCZOS)
 
     def sauvegarder(self):
         """Sauvegarde l'image traitée sur le disque dur
 
         """
         self.image.save(self.destination + "/" + self.name)
-        print("{} : fait.", {self.name})
+        print("{} : OK.".format(self.name))

@@ -14,7 +14,7 @@ def process_json(json_file):
     Fonction assurant la lecture des paramètres de traitement par lot JSON.
     """
     try:
-        parameters = json.loads(json_file)
+        parameters = json.loads(json_file.read())
     except json.JSONDecodeError:
         sys.stderr.write("Impossible d'extraire les paramètres\
          du fichier {}.\n".format(json_file.name))
@@ -27,5 +27,9 @@ def batch_processing(files, parameters, dest):
     Fonction assurant le traitement par lot
     """
     for url_photo in files:
-        file = Photo(url_photo)
+        file = Photo(url_photo, dest)
         # traitement photo
+        if "size" in parameters:
+            file.redimensionner(*parameters["size"])
+
+        file.sauvegarder()
