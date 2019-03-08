@@ -2,3 +2,4 @@
 .coverage
 /.cache
 /__pycache__
+*.swp
