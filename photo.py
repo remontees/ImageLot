@@ -86,9 +86,34 @@ class Photo:
         de caractère
 
         """
+        self.draw = ImageDraw.Draw(self.image)
+        coords = tuple(coords)
         url_font, taille_font = font
-        font = ImageFont.truetype(url_font, taille_font)
-        self.draw.text(coords, texte, couleur, font=font)
+
+        try:
+            font = ImageFont.truetype(url_font, taille_font)
+        except (FileNotFoundError, OSError):
+            sys.stderr.write("Chargement de la police d'écriture impossible.\n")
+            sys.exit(1)
+
+        coords_txt = [None, None]
+        text_size = list(self.draw.textsize(texte, font=font))
+
+        if coords[0] == "gauche":
+            coords_txt[0] = 5
+        if coords[0] == "centre":
+            coords_txt[0] = self.taille[0] // 2 - text_size[0] // 2
+        if coords[0] == "droite":
+            coords_txt[0] = self.taille[0] - text_size[0] - 5
+        if coords[1] == "bas":
+            coords_txt[1] = self.taille[1] - text_size[1] - 5
+        if coords[1] == "centre":
+            coords_txt[1] = self.taille[1] // 2 - text_size[1] // 2
+        if coords[1] == "haut":
+            coords_txt[1] = 5
+
+        coords_txt = tuple(coords_txt)
+        self.draw.text(coords_txt, texte, couleur, font=font)
 
     def ajouter_logo(self, logo_watermark, coords):
         """Ajout d'une image (type logo) en watermark sur l'image instanciée
@@ -114,8 +139,6 @@ class Photo:
 
         # Gestion du ratio
         ratio = self.taille[0] / self.taille[1]
-
-        print(self.taille, self)
 
         if self.taille[1] > self.taille[0]:
             largeur = int(hauteur*ratio)

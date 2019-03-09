@@ -6,8 +6,8 @@
     },
     "copyright": {
         "text": "© 2019 - remontees",
-        "font": "Ubuntu",
-        "coords": [0, 0],
+        "font": ["Ubuntu-R", 18],
+        "coords": ["gauche", "bas"],
         "color": "black"
     }
 }
