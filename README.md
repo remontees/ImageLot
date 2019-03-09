@@ -20,6 +20,26 @@ Permet par ligne de commande (puis interface graphique) de faire différentes op
 * Ajout de textes
 * Ajout d'images (logos) en watermark
 
+Installation
+------------
+
+### Installation des dépendances
+
+À la racine du projet, lancez la commande suivante pour installer les librairies dont dépend ImageLot :
+
+```bash
+pip install -r requirements.txt -v
+```
+Sachez que la seule dépendance strictement nécessaire pour l'exécution du programme est la librairie de manipulation d'images `Pillow` (fork de la très connue librairie Python2 `PIL`).
+
+### Génération d'un exécutable
+
+Pour générer un exécutable pour votre système, installez `cx_freeze` (compris dans l'installation des dépendances, cf. paragraphe précédent). Exécutez ensuite la commande suivante à la racine du projet :
+```bash
+python3 setup.py build
+```
+Vous devriez voir apparaître un sous-répertoire `build` dans lequel se situe d'autres sous-répertoires dans lequels a été généré l'exécutable.
+
 Lancement du programme graphique
 --------------------------------
 
