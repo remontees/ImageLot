@@ -20,6 +20,16 @@ Permet par ligne de commande (puis interface graphique) de faire différentes op
 * Ajout de textes
 * Ajout d'images (logos) en watermark
 
+Lancement du programme graphique
+--------------------------------
+
+Il suffit d'exécuter le fichier `imagelot_gui.py` (après lui avoir préalablement donné les droits d'exécution). Cette version graphique d'ImageLot est réalisée à l'aide de PyQt5.
+
+Elle assure pour le moment uniquement les fonctionnalités suivantes :
+
+* Redimensionnement
+* Ajout de bordures
+
 Utilisation en ligne de commande (CLI)
 --------------------------------------
 
