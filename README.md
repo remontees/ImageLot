@@ -15,12 +15,12 @@ Fonctionnalités
 
 Permet par ligne de commande (puis interface graphique) de faire différentes opérations de traitement par lot sur des photos :
 
-* Redimensionnement
-* Ajout de bordures
-* Ajout de textes
-* Ajout d'images (logos) en watermark
+* Redimensionnement.
+* Ajout de bordures.
+* Ajout de textes.
+* Ajout d'images (logos) en watermark.
 
-### Problèmes non-résolus
+### Problèmes non résolus
 
 * Trouver l'URL d'une police d'écriture avec `QFont` ou `QFontInfo` pour pouvoir réutiliser la police d'écriture avec Pillow… Si vous savez faire, merci de me contacter à remontees<at>free.fr !! :-)
 
@@ -51,8 +51,11 @@ Il suffit d'exécuter le fichier `imagelot_gui.py` (après lui avoir préalablem
 
 Elle assure pour le moment uniquement les fonctionnalités suivantes :
 
-* Redimensionnement
-* Ajout de bordures
+* Redimensionnement.
+* Ajout de bordures.
+* Ajout de textes (problème avec les polices d'écriture, voir paragraphe **Problèmes non résolus**).
+* Ajout d'images (logos) en watermark.
+* À chaque traitement par lot, les paramètres courants sont enregistrés dans `parameters.json`.
 
 Utilisation en ligne de commande (CLI)
 --------------------------------------
