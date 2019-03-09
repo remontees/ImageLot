@@ -9,9 +9,5 @@
         "font": ["Ubuntu-R", 18],
         "coords": ["gauche", "bas"],
         "color": "black"
-    },
-    "watermark": {
-        "url": "copyright.png",
-        "coords": ["gauche", "bas"]
     }
 }

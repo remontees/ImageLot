@@ -9,7 +9,7 @@ class TestPhoto:
     """
     Classe de test de la classe Photo
     """
-    photo_jpg = Photo("test.jpg")
+    photo_jpg = Photo("test.jpg", "test")
     photo_bmp = None
 
     def test_attr(self):
@@ -17,8 +17,8 @@ class TestPhoto:
         Teste les attributs de l'objet
         """
         assert self.photo_jpg.name == "test.jpg"
-        assert self.photo_jpg.largeur == 3072
-        assert self.photo_jpg.hauteur == 2304
+        assert self.photo_jpg.taille[0] == 3072
+        assert self.photo_jpg.taille[1] == 2304
 
     def test_str(self):
         """
@@ -33,7 +33,7 @@ class TestPhoto:
         """
         erreur = False
         try:
-            self.photo_bmp = Photo("test.bmp")
+            self.photo_bmp = Photo("test.bmp", "test")
         except TypeError:
             erreur = True
         finally:
