@@ -13,15 +13,12 @@ La version par interface graphique utilisant GTK+3 est pour le moment abandonné
 Fonctionnalités
 ---------------
 
-EN COURS DE DEVELOPPEMENT
-
-
-Permettra par ligne de commande (puis interface graphique) de faire différentes opérations de traitement par lot sur des photos :
+Permet par ligne de commande (puis interface graphique) de faire différentes opérations de traitement par lot sur des photos :
 
 * Redimensionnement
 * Ajout de bordures
 * Ajout de textes
-* Ajout d'images (logos) en watermark (à terme)
+* Ajout d'images (logos) en watermark
 
 Utilisation en ligne de commande (CLI)
 --------------------------------------
@@ -45,7 +42,9 @@ optional arguments:
 
 ### Spécification des paramètres de traitement par lot (CLI)
 
-Les opérations à effectuer sur le lot d'images sont à spécifier dans un fichier `JSON` dont vous passerez l'adresse en paramètre `-p` ou `--parameters` à ImageLot. Voici un exemple de configuration `JSON` pour ImageLot :
+Les opérations à effectuer sur le lot d'images sont à spécifier dans un fichier `JSON` dont vous passerez l'adresse en paramètre `-p` ou `--parameters` à ImageLot.
+
+#### Exemple de configuration `JSON` pour un copyright texte
 
 ```json
 {
@@ -59,6 +58,23 @@ Les opérations à effectuer sur le lot d'images sont à spécifier dans un fich
         "font": "Ubuntu",
         "coords": [0, 0],
         "color": "black"
+    }
+}
+```
+
+#### Exemple de configuration `JSON` pour un watermark
+
+Où `copyright.png` est le watermark à appliquer aux photos dans le dossier courant d'exécution.
+```json
+{
+    "size": [900, 900],
+    "border": {
+        "color": "black",
+        "width": 3
+    },
+    "watermark": {
+        "url": "copyright.png",
+        "coords": ["gauche", "bas"]
     }
 }
 ```
