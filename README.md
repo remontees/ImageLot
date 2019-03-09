@@ -33,6 +33,10 @@ Elle assure pour le moment uniquement les fonctionnalités suivantes :
 Utilisation en ligne de commande (CLI)
 --------------------------------------
 
+### Préambule
+
+La version en ligne de commande d'ImageLot implémente toutes les fonctionnalités (contrairement à la version graphique pour le moment).
+
 ### Syntaxe d'utilisation en ligne de commande
 
 ```
