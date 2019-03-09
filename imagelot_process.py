@@ -80,4 +80,4 @@ def batch_processing(files, parameters, dest):
         thread.join()
     fin = time.time()
 
-    print("\nTraitement par lot terminé en {} s !".format(round(fin-debut, 5)))
+    return "Traitement par lot terminé en {} s !".format(round(fin-debut, 5))

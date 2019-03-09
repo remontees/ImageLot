@@ -55,7 +55,8 @@ def main_cli():
         sys.exit(1)
 
     parameters = process_json(parameters_file)
-    batch_processing(args.f, parameters, args.dest)
+    response = batch_processing(args.f, parameters, args.dest)
+    print(response)
 
 
 # Si l'on exécute le fichier, on lance la fonction main_gui

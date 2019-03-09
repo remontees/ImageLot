@@ -41,3 +41,20 @@ def position_rel(tab, image):
         coords[1] = 5
 
     return coords
+
+def pretty_list(liste):
+    """Affiche joliment une liste Python
+
+    """
+    # Cas liste vide
+    if not liste:
+        return ""
+
+    # Cas liste non vide
+    iterateur_liste = iter(liste)
+    liste_finale = next(iterateur_liste)
+
+    for element in iterateur_liste:
+        liste_finale += ", " + element
+
+    return liste_finale

@@ -4,101 +4,277 @@
 Module principal permettant l'implémentation de l'interface graphique
 du programme ImageLot
 
-Dépendances : librairie Gtk
+Dépendances : librairie PyQt, json
 
 """
-from gi.repository import Gtk
-from gui_utils import create_img_chooser, create_position_chooser
-from datetime import datetime
-import gi
-gi.require_version('Gtk', '3.0')
+import sys
+import json
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, \
+                            QFormLayout, QPushButton, QLineEdit, QFileDialog, QColorDialog, \
+                            QSpinBox, QCheckBox, QAction, QLabel, QFrame, QMessageBox,\
+                            QErrorMessage, qApp
+from utils import pretty_list
+from imagelot_process import batch_processing
 
-def main_gui():
+class Form(QWidget):
+    """ Classe représentant le formulaire complet.
+
     """
-    Fonction permettant d'initialiser les paramètres de la fenêtre
+    def __init__(self):
+        """ Constructeur du formulaire
+
+        """
+        super().__init__()
+        self.files = []
+        self.border_color = QColor(0, 0, 0)
+        self.border_width = 1
+        self.parameters = {} # Ce qui contiendra les paramètres à exporter
+        self.dest = ""
+        self.run_main()
+
+    def show_files_dialog(self):
+        """ Affichage de la fenêtre de sélection des photos à traiter
+
+        """
+        file_dialog = QFileDialog().getOpenFileNames(self, "Choisir des images",\
+                                                     "", "Photos (*.jpg *.png *.gif)")
+
+        self.files = file_dialog[0]
+        self.line_img.setText(pretty_list(file_dialog[0]))
+
+    def show_directory_dialog(self):
+        """ Affichage de la fenêtre de sélection des photos à traiter
+
+        """
+        directory_dialog = QFileDialog().getExistingDirectory(self,
+                                                              "Sélectionner",
+                                                              "",
+                                                              QFileDialog.ShowDirsOnly |
+                                                              QFileDialog.DontResolveSymlinks)
+
+        self.dest = directory_dialog
+        self.line_dest.setText(directory_dialog)
+
+    def show_bordercolor_dialog(self):
+        """ Affichage de la fenêtre de sélection de la couleur de bordure
+
+        """
+        self.border_color = QColorDialog().getColor()
+
+        if self.border_color.isValid():
+            self.color_btn.setStyleSheet("QWidget { background-color: %s }"% self.border_color.name())
+
+    def disable_border(self):
+        """ Choisit ou non de rendre inactif la partie "choix de bordure"
+
+        """
+        if self.is_border.isChecked():
+            self.border_width.setDisabled(False)
+            self.color_btn.setDisabled(False)
+        else:
+            self.border_width.setDisabled(True)
+            self.color_btn.setDisabled(True)
+
+    def disable_redim(self):
+        """ Choisit ou non de rendre inactif la partie "redimensionnement"
+
+        """
+        if self.is_redim.isChecked():
+            self.width.setDisabled(False)
+            self.height.setDisabled(False)
+        else:
+            self.width.setDisabled(True)
+            self.height.setDisabled(True)
+
+    def process_form(self):
+        """ Effectue le chargement des données du formulaire puis l'exécution
+        du traitement par lot
+
+        """
+        if not self.files:
+            errorbox = QMessageBox()
+            errorbox.setText("Aucune photo sélectionnée !")
+            errorbox.setWindowTitle("Erreur")
+            errorbox.exec_()
+            return
+
+        if self.dest == "":
+            errorbox = QMessageBox()
+            errorbox.setText("Merci de sélectionner un dossier d'enregistrement !")
+            errorbox.setWindowTitle("Erreur")
+            errorbox.exec_()
+            return
+
+        if self.is_border.isChecked():
+            self.parameters["border"] = {}
+            self.parameters["border"]["color"] = self.border_color.name()
+            self.parameters["border"]["width"] = int(self.border_width.value())
+        else:
+            if "border" in self.parameters:
+                del self.parameters["border"]
+
+        if self.is_redim.isChecked():
+            self.parameters["size"] = [self.width.value(), self.height.value()]
+        else:
+            if "size" in self.parameters:
+                del self.parameters["size"]
+
+        result = batch_processing(self.files, self.parameters, self.dest)
+
+        msgbox = QMessageBox()
+        msgbox.setText(result)
+        msgbox.setWindowTitle("Traitement par lot terminé")
+        msgbox.exec_()
+
+    def run_main(self):
+        """ Construit l'ensemble du formulaire
+
+        """
+        main_layout = QVBoxLayout()
+
+        form_layout = QFormLayout()
+        file_widget = QWidget()
+
+        hbox_img_files = QHBoxLayout()
+        hbox_img_files.addWidget(QLabel("Photos :"))
+        self.line_img = QLineEdit()
+        self.line_img.setReadOnly(True)
+        browse_button = QPushButton("&Parcourir...")
+        hbox_img_files.addWidget(self.line_img)
+        hbox_img_files.addWidget(browse_button)
+
+        browse_button.clicked.connect(self.show_files_dialog)
+        file_widget.setLayout(hbox_img_files)
+
+        form_layout.addRow(file_widget)
+
+        separateur1 = QFrame()
+        separateur1.setFrameStyle(QFrame.HLine | QFrame.Raised)
+
+        form_layout.addRow(separateur1)
+
+        self.is_redim = QCheckBox()
+        self.is_redim.stateChanged.connect(self.disable_redim)
+        form_layout.addRow("&Redimensionner :", self.is_redim)
+
+        ## REDIMENSIONNEMENT
+
+        separateur2 = QFrame()
+        separateur2.setFrameStyle(QFrame.HLine | QFrame.Raised)
+        form_layout.addRow(separateur2)
+
+        self.width = QSpinBox()
+        self.width.setRange(1, 50000)
+        self.width.setSuffix(" px")
+        self.height = QSpinBox()
+        self.height.setRange(1, 50000)
+        self.height.setSuffix(" px")
+        self.width.setDisabled(True)
+        self.height.setDisabled(True)
+        form_layout.addRow("&Nouvelle largeur :", self.width)
+        form_layout.addRow("&Nouvelle hauteur :", self.height)
+
+        ## BORDURES
+
+        separateur3 = QFrame()
+        separateur3.setFrameStyle(QFrame.HLine | QFrame.Raised)
+        form_layout.addRow(separateur3)
+
+        self.is_border = QCheckBox()
+        self.is_border.stateChanged.connect(self.disable_border)
+        form_layout.addRow("&Ajouter une bordure :", self.is_border)
+
+        self.border_width = QSpinBox()
+        self.border_width.setMinimum(1)
+        self.border_width.setSuffix(" px")
+        form_layout.addRow("&Taille de la bordure :", self.border_width)
+
+        self.color_btn = QPushButton()
+        self.color_btn.clicked.connect(self.show_bordercolor_dialog)
+        self.color_btn.setStyleSheet("QWidget { background-color: %s }" % self.border_color.name())
+        self.border_width.setDisabled(True)
+        self.color_btn.setDisabled(True)
+
+        form_layout.addRow("&Couleur de la bordure :", self.color_btn)
+
+        ## DOSSIER DESTINATION
+
+        separateur4 = QFrame()
+        separateur4.setFrameStyle(QFrame.HLine | QFrame.Raised)
+        form_layout.addRow(separateur4)
+
+        dest_widget = QWidget()
+        hbox_dest = QHBoxLayout()
+        hbox_dest.addWidget(QLabel("Où enregistrer les photos traitées ?"))
+        self.line_dest = QLineEdit()
+        self.line_dest.setReadOnly(True)
+        browse_dest_button = QPushButton("P&arcourir...")
+        hbox_dest.addWidget(self.line_dest)
+        hbox_dest.addWidget(browse_dest_button)
+
+        browse_dest_button.clicked.connect(self.show_directory_dialog)
+        dest_widget.setLayout(hbox_dest)
+        form_layout.addRow(dest_widget)
+
+        main_layout.addLayout(form_layout)
+
+        btn_valider = QPushButton("&Exécuter les tâches")
+        btn_valider.clicked.connect(self.process_form)
+        main_layout.addStretch(1)
+        main_layout.addWidget(btn_valider)
+
+        self.setLayout(main_layout)
+
+    def get_parameters_json(self):
+        """ Retourne les paramètres du traitement par lot au format JSON.
+
+        """
+        return json.dumps(self.parameters)
+
+
+class Fenetre(QMainWindow):
+    """ Classe représentant la fenêtre principale.
+    Hérite de QWidget.
+
     """
-    window = Gtk.Window()
-    window.set_title("ImageLot - Traitement par lot d'images")
-    window.set_default_size(640, 480)
-    # Événément permettant d'assurer la fermeture correcte du logiciel
-    window.connect('delete-event', Gtk.main_quit)
+    def __init__(self):
+        """ Constructeur de la fenêtre par héritage de QWidget
 
-    # Définition de la grille de l'interface
-    main_grid = Gtk.Grid()
+        """
+        super().__init__()
+        self.run_main()
 
-    # Petit message d'accueil :-)
-    label_home = Gtk.Label()
-    label_home.set_markup('<b><span size="large">Bienvenue sur ImageLot !</span></b>')
-    label_home.set_halign(Gtk.Align.START)
-    main_grid.attach(label_home, 0, 0, 2, 1)
+    def run_main(self):
+        """ Configuration de la fenêtre principale
 
-    # Sélection multiple des fichiers
-    label_file = Gtk.Label("Sélectionnez les photos à traiter : ")
-    label_file.set_halign(Gtk.Align.START)
-    main_grid.attach(label_file, 0, 1, 1, 1)
+        """
+        exit_action = QAction('&Exit', self)
+        exit_action.setText("&Quitter")
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip("Quitter ImageLot")
+        exit_action.triggered.connect(qApp.exit)
 
-    file_chooser = create_img_chooser("Sélectionnez les photos à traiter par lot", window, True)
-    main_grid.attach(file_chooser, 1, 1, 1, 1)
+        menu = self.menuBar()
+        menu_fichier = menu.addMenu("&Fichier")
+        menu_fichier.addAction(exit_action)
 
-    # Commenté pour laisser la possibilité de mettre en place un watermark
-    # label_watermark_chooser = Gtk.Label("Logo en watermark : ")
-    # label_watermark_chooser.set_halign(Gtk.Align.START)
-    # main_grid.attach(label_watermark_chooser, 0, 3, 1, 1)
-    #
-    # watermark_chooser = create_img_chooser("Choisir un logo en watermark :", window)
-    # main_grid.attach(watermark_chooser, 1, 3, 1, 1)
+        form_widget = Form()
 
-    # Texte et mise en forme du texte du copyright
-    label_copyright_text = Gtk.Label("Texte de copyright :")
-    label_copyright_text.set_halign(Gtk.Align.START)
-    main_grid.attach(label_copyright_text, 0, 3, 1, 1)
+        self.setCentralWidget(form_widget)
 
-    copyright_text = Gtk.Entry()
-    copyright_text.set_max_length(250)
-    copyright_text.set_text('© ' + str(datetime.now().year))
-    main_grid.attach(copyright_text, 1, 3, 1, 1)
+        self.setGeometry(300, 300, 500, 250)
+        self.setWindowTitle("Traitement par lot - ImageLot")
 
-    label_copyright_font = Gtk.Label("Police d'écriture :")
-    label_copyright_font.set_halign(Gtk.Align.START)
-    main_grid.attach(label_copyright_font, 0, 4, 1, 1)
+        self.show()
 
-    copyright_font = Gtk.FontButton()
-    main_grid.attach(copyright_font, 1, 4, 1, 1)
+def main(args):
+    """Fonction permettant de démarrer la fenêtre graphique
 
-    boxposition = create_position_chooser()
-    main_grid.attach(boxposition, 1, 5, 1, 1)
-
-    label_text_align = Gtk.Label("Alignement du copyright sur la photo : ")
-    label_text_align.set_halign(Gtk.Align.START)
-    main_grid.attach(label_text_align, 0, 5, 1, 1)
-
-    label_copyright = Gtk.CheckButton.new_with_label('Ajouter un copyright texte sur les photos : ')
-    tab_components = [label_copyright_text, copyright_text, label_text_align, boxposition, \
-    label_copyright_font, copyright_font]
-    label_copyright.connect('toggled', callback_copyright, tab_components)
-    label_copyright.set_active(True)
-    main_grid.attach(label_copyright, 0, 2, 1, 1)
-
-    button_save = Gtk.Button(label="Exécuter les actions")
-    main_grid.attach(button_save, 0, 1000, 1, 1)
-
-    window.add(main_grid)
-
-    window.show_all()
-    Gtk.main()
-
-def callback_copyright(checkbox, tab_components):
     """
-    Fonction de callback permettant d'afficher/masquer les éléments permettant de choisir
-    le copyright texte à ajouter
-    """
-    if checkbox.get_active() is False:
-        for component in tab_components:
-            component.hide()
-    else:
-        for component in tab_components:
-            component.show()
+    application_courante = QApplication(sys.argv)
+    window = Fenetre()
+    sys.exit(application_courante.exec_())
 
-# Si l'on exécute le fichier, on lance la fonction main_gui
-if __name__ == '__main__':
-    main_gui()
+if __name__ == "__main__":
+    main(sys.argv)
