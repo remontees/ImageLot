@@ -55,6 +55,7 @@ def main_cli():
         sys.exit(1)
 
     parameters = process_json(parameters_file)
+    parameters_file.close()
     response = batch_processing(args.f, parameters, args.dest)
     print(response)
 

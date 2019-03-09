@@ -20,9 +20,11 @@ Permet par ligne de commande (puis interface graphique) de faire différentes op
 * Ajout de textes.
 * Ajout d'images (logos) en watermark.
 
-### Problèmes non résolus
+### Problèmes en suspens
 
 * Trouver l'URL d'une police d'écriture avec `QFont` ou `QFontInfo` pour pouvoir réutiliser la police d'écriture avec Pillow… Si vous savez faire, merci de me contacter à remontees<at>free.fr !! :-)
+* Si je mets des labels "normaux" devant les widgets composés (type widgets pour sélectionner des fichiers, faits à la main), ils ne sont pas alignés verticalement avec ces widgets. :-/
+* N'étant pas particulièrement doué en dessin sur ordinateur, je suis à la recherche de quelqu'un pour m'aider à réaliser le logo du logiciel.
 
 Installation
 ------------
@@ -56,6 +58,7 @@ Elle assure pour le moment uniquement les fonctionnalités suivantes :
 * Ajout de textes (problème avec les polices d'écriture, voir paragraphe **Problèmes non résolus**).
 * Ajout d'images (logos) en watermark.
 * À chaque traitement par lot, les paramètres courants sont enregistrés dans `parameters.json`.
+* À chaque lancement du logiciel, les paramètres de l'exécution précédente (ou spécifiés à la main) présents dans le fichier `parameters.json` à l'archive du projet sont réutilisés (dans la limite de ce que j'ai réussi à faire avec Qt pour le support des polices d'écriture :-/).
 
 Utilisation en ligne de commande (CLI)
 --------------------------------------

@@ -9,13 +9,13 @@ Dépendances : librairie PyQt, json
 """
 import sys
 import json
-from PyQt5.QtGui import QColor, QFontInfo
+from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, \
                             QFormLayout, QPushButton, QFontDialog, QFileDialog, QColorDialog, \
                             QSpinBox, QCheckBox, QAction, QLabel, QFrame, QMessageBox,\
                             QComboBox, QErrorMessage, QLineEdit, qApp
 from utils import pretty_list
-from imagelot_process import batch_processing
+from imagelot_process import process_json, batch_processing
 
 class Form(QWidget):
     """ Classe représentant le formulaire complet.
@@ -32,7 +32,16 @@ class Form(QWidget):
         self.border_width = 1
         self.font_editor = None
         self.url_watermark = ""
-        self.parameters = {} # Ce qui contiendra les paramètres à exporter
+
+        try:
+            parameters_file = open("parameters.json", 'r')
+            self.parameters = process_json(parameters_file)
+            parameters_file.close()
+        except IOError:
+            self.parameters = {} # En cas de souci
+
+        print(self.parameters)
+
         self.dest = ""
         self.run_main()
 
@@ -76,7 +85,8 @@ class Form(QWidget):
         self.border_color = QColorDialog().getColor()
 
         if self.border_color.isValid():
-            self.color_btn.setStyleSheet("QWidget { background-color: %s }"% self.border_color.name())
+            self.color_btn.setStyleSheet("QWidget { background-color: %s }"\
+            % self.border_color.name())
 
     def show_textcolor_dialog(self):
         """ Affichage de la fenêtre de sélection de la couleur du texte
@@ -85,15 +95,19 @@ class Form(QWidget):
         self.text_color = QColorDialog().getColor()
 
         if self.text_color.isValid():
-            self.color_btn_txt.setStyleSheet("QWidget { background-color: %s }"% self.text_color.name())
+            self.color_btn_txt.setStyleSheet("QWidget { background-color: %s }"\
+            % self.text_color.name())
 
     def show_font_dialog(self):
         """ Affichage de la fenêtre de mise en forme du texte
 
         """
-        self.font_editor, ok = QFontDialog().getFont()
+        if self.font_editor is not None:
+            self.font_editor, valid_load = QFontDialog(self.font_editor).getFont()
+        else:
+            self.font_editor, valid_load = QFontDialog().getFont()
 
-        if ok:
+        if valid_load:
             self.font_label.setText(self.font_editor.family())
             self.font_label.setFont(self.font_editor)
 
@@ -187,7 +201,7 @@ class Form(QWidget):
         if self.set_copyright.isChecked():
             self.parameters["copyright"] = {}
             self.parameters["copyright"]["text"] = self.text_copyright.text()
-            self.parameters["copyright"]["font"] = [QFontInfo(self.font_editor).family(),
+            self.parameters["copyright"]["font"] = [self.font_editor.family(),
                                                     self.font_editor.pointSize()]
 
             # Spécification des positionnements
@@ -276,11 +290,10 @@ class Form(QWidget):
 
         form_layout.addRow(separateur1)
 
+        ## REDIMENSIONNEMENT
         self.set_redim = QCheckBox()
         self.set_redim.stateChanged.connect(self.disable_redim)
         form_layout.addRow("&Redimensionner :", self.set_redim)
-
-        ## REDIMENSIONNEMENT
 
         self.width = QSpinBox()
         self.width.setRange(1, 50000)
@@ -292,6 +305,14 @@ class Form(QWidget):
         self.height.setDisabled(True)
         form_layout.addRow("&Nouvelle largeur (format \"paysage\") :", self.width)
         form_layout.addRow("N&ouvelle hauteur (format \"portrait\") :", self.height)
+
+        if "size" in self.parameters:
+            self.set_redim.setChecked(2)
+            self.disable_redim()
+
+            if self.parameters["size"] is not None and len(self.parameters["size"]) == 2:
+                self.width.setValue(int(self.parameters["size"][0]))
+                self.height.setValue(int(self.parameters["size"][1]))
 
         ## BORDURES
         separateur2 = QFrame()
@@ -314,6 +335,16 @@ class Form(QWidget):
         self.color_btn.setDisabled(True)
 
         form_layout.addRow("&Couleur de la bordure :", self.color_btn)
+
+        if "border" in self.parameters:
+            self.set_border.setChecked(2)
+            self.disable_border()
+
+            if "width" in self.parameters["border"]:
+                self.border_width.setValue(int(self.parameters["border"]["width"]))
+            if "color" in self.parameters["border"]:
+                self.color_btn.setStyleSheet("QWidget { background-color: %s }" % self.parameters["border"]["color"])
+                self.border_color = QColor(self.parameters["border"]["color"])
 
         ## COPYRIGHT
         separateur3 = QFrame()
@@ -364,6 +395,35 @@ class Form(QWidget):
 
         form_layout.addRow("&Positionnement vertical :", self.combov_text)
 
+        if "copyright" in self.parameters:
+            self.set_copyright.setChecked(2)
+            self.disable_copyright()
+
+            if "text" in self.parameters["copyright"]:
+                self.text_copyright.setText(self.parameters["copyright"]["text"])
+            if "color" in self.parameters["copyright"]:
+                self.color_btn_txt.setStyleSheet("QWidget { background-color: %s }" % self.parameters["copyright"]["color"])
+                self.text_color = QColor(self.parameters["copyright"]["color"])
+            if "font" in self.parameters["copyright"]:
+                self.font_editor = QFont(self.parameters["copyright"]["font"][0], self.parameters["copyright"]["font"][1])
+                self.font_label.setText(self.font_editor.family())
+                self.font_label.setFont(self.font_editor)
+            if "coords" in self.parameters["copyright"]:
+                if self.parameters["copyright"]["coords"][0] == "gauche":
+                    self.comboh_text.setCurrentIndex(0)
+                elif self.parameters["copyright"]["coords"][0] == "centre":
+                    self.comboh_text.setCurrentIndex(1)
+                elif self.parameters["copyright"]["coords"][0] == "droite":
+                    self.comboh_text.setCurrentIndex(2)
+
+                if self.parameters["copyright"]["coords"][1] == "haut":
+                    self.combov_text.setCurrentIndex(0)
+                elif self.parameters["copyright"]["coords"][1] == "centre":
+                    self.combov_text.setCurrentIndex(1)
+                elif self.parameters["copyright"]["coords"][1] == "bas":
+                    self.combov_text.setCurrentIndex(2)
+
+
         ## AJOUTER WATERMARK
         separateur4 = QFrame()
         separateur4.setFrameStyle(QFrame.HLine | QFrame.Raised)
@@ -404,6 +464,28 @@ class Form(QWidget):
         self.combov_watermark.setDisabled(True)
 
         form_layout.addRow("&Positionnement vertical :", self.combov_watermark)
+
+        if "watermark" in self.parameters:
+            self.set_watermark.setChecked(2)
+            self.disable_watermark()
+
+            if "url" in self.parameters["watermark"]:
+                self.line_watermark.setText(self.parameters["watermark"]["url"])
+                self.url_watermark = self.parameters["watermark"]["url"]
+            if "coords" in self.parameters["watermark"]:
+                if self.parameters["watermark"]["coords"][0] == "gauche":
+                    self.comboh_watermark.setCurrentIndex(0)
+                elif self.parameters["watermark"]["coords"][0] == "centre":
+                    self.comboh_watermark.setCurrentIndex(1)
+                elif self.parameters["watermark"]["coords"][0] == "droite":
+                    self.comboh_watermark.setCurrentIndex(2)
+
+                if self.parameters["watermark"]["coords"][1] == "haut":
+                    self.combov_watermark.setCurrentIndex(0)
+                elif self.parameters["watermark"]["coords"][1] == "centre":
+                    self.combov_watermark.setCurrentIndex(1)
+                elif self.parameters["watermark"]["coords"][1] == "bas":
+                    self.combov_watermark.setCurrentIndex(2)
 
         ## DOSSIER DESTINATION
         separateur5 = QFrame()
