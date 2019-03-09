@@ -172,8 +172,8 @@ class Form(QWidget):
         self.height.setSuffix(" px")
         self.width.setDisabled(True)
         self.height.setDisabled(True)
-        form_layout.addRow("&Nouvelle largeur :", self.width)
-        form_layout.addRow("&Nouvelle hauteur :", self.height)
+        form_layout.addRow("&Nouvelle largeur (format \"paysage\") :", self.width)
+        form_layout.addRow("N&ouvelle hauteur (format \"portrait\") :", self.height)
 
         ## BORDURES
 
@@ -206,7 +206,7 @@ class Form(QWidget):
 
         dest_widget = QWidget()
         hbox_dest = QHBoxLayout()
-        hbox_dest.addWidget(QLabel("Où enregistrer les photos traitées ?"))
+        hbox_dest.addWidget(QLabel("Dossier d'enregistrement :"))
         self.line_dest = QLineEdit()
         self.line_dest.setReadOnly(True)
         browse_dest_button = QPushButton("P&arcourir...")
@@ -245,19 +245,30 @@ class Fenetre(QMainWindow):
         super().__init__()
         self.run_main()
 
+    def about(self):
+        """ Une petite fenêtre d'informations à propos
+
+        """
+        QMessageBox.about(self, "ImageLot",
+                          "Application de traitement par lot de photos réalisée en Python3 à l'aide\ndes librairies Pillow et PyQt5.\nPartagé sous licence libre GPL-3.0.\n\nAuteur : remontees (2017-2019).")
+
     def run_main(self):
         """ Configuration de la fenêtre principale
 
         """
-        exit_action = QAction('&Exit', self)
+        exit_action = QAction('&Quitter', self)
         exit_action.setText("&Quitter")
         exit_action.setShortcut('Ctrl+Q')
         exit_action.setStatusTip("Quitter ImageLot")
         exit_action.triggered.connect(qApp.exit)
 
+        about_action = QAction('À &propos', self)
+        about_action.triggered.connect(self.about)
+
         menu = self.menuBar()
         menu_fichier = menu.addMenu("&Fichier")
         menu_fichier.addAction(exit_action)
+        menu_fichier.addAction(about_action)
 
         form_widget = Form()
 

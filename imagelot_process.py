@@ -21,6 +21,11 @@ def process_json(json_file):
         sys.stderr.write("Impossible de lire les paramètres {}.\n".format(json_file.name))
         sys.exit(1)
 
+    if "size" in parameters:
+        if parameters["size"][0] > 50000 or parameters["size"][1] > 50000:
+            sys.stderr.write("La taille de l'image ne peut dépasser 50000 px.\n")
+            sys.exit(1)
+
     if "copyright" in parameters and "coords" in parameters["copyright"]:
         if not verif_coords(parameters["copyright"]["coords"]):
             sys.stderr.write("Positionnement du copyright invalide.\n")
