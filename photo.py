@@ -8,7 +8,7 @@ Utilise la librairie Pillow (fork de PIL pour Python3)
 from os.path import basename
 import sys
 from PIL import Image, ImageFont, ImageDraw
-from utils import calcul_bordure
+from utils import calcul_bordure, position_rel
 
 class Photo:
     """ Classe permettant de manipuler une photo.
@@ -87,7 +87,6 @@ class Photo:
 
         """
         self.draw = ImageDraw.Draw(self.image)
-        coords = tuple(coords)
         url_font, taille_font = font
 
         try:
@@ -96,21 +95,19 @@ class Photo:
             sys.stderr.write("Chargement de la police d'écriture impossible.\n")
             sys.exit(1)
 
-        coords_txt = [None, None]
         text_size = list(self.draw.textsize(texte, font=font))
 
-        if coords[0] == "gauche":
-            coords_txt[0] = 5
+        # Définition des coordonnées relatives de positionnement du texte
+        coords_txt = position_rel(coords, self)
+        # Ajustement avec la taille du texte
         if coords[0] == "centre":
-            coords_txt[0] = self.taille[0] // 2 - text_size[0] // 2
+            coords_txt[0] -= text_size[0] // 2
         if coords[0] == "droite":
-            coords_txt[0] = self.taille[0] - text_size[0] - 5
+            coords_txt[0] -= text_size[0]
         if coords[1] == "bas":
-            coords_txt[1] = self.taille[1] - text_size[1] - 5
+            coords_txt[1] -= text_size[1]
         if coords[1] == "centre":
-            coords_txt[1] = self.taille[1] // 2 - text_size[1] // 2
-        if coords[1] == "haut":
-            coords_txt[1] = 5
+            coords_txt[1] -= text_size[1] // 2
 
         coords_txt = tuple(coords_txt)
         self.draw.text(coords_txt, texte, couleur, font=font)
@@ -120,12 +117,25 @@ class Photo:
         dans l'objet courant
 
         """
-        coord_x, coord_y = coords
+        # Définition des coordonnées relatives de positionnement du watermark
+        coords_img = position_rel(coords, self)
+
         with Image.open(logo_watermark) as image_ouverte:
             # Vérification du format de l'image
             if image_ouverte.format not in ("JPEG", "PNG", "GIF"):
                 raise TypeError("Le format de l'image doit être en JPEG, PNG ou GIF.")
-            self.image.paste(logo_watermark, (0, 0, coord_x, coord_y))
+
+            # Définition de la zone de collage en fonction de la taille du watermark
+            if coords[0] == "centre":
+                coords_img[0] -= image_ouverte.size[0] // 2
+            if coords[0] == "droite":
+                coords_img[0] -= image_ouverte.size[0]
+            if coords[1] == "bas":
+                coords_img[1] -= image_ouverte.size[1]
+            if coords[1] == "centre":
+                coords_img[1] -= image_ouverte.size[1] // 2
+
+            self.image.paste(image_ouverte, tuple(coords_img), image_ouverte)
 
     # S'exécute uniquement en première fonction de traitement
     def redimensionner(self, largeur, hauteur):

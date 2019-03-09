@@ -11,3 +11,33 @@ def calcul_bordure(longueur_cote, largeur_bordure):
 
     """
     return longueur_cote+2*largeur_bordure
+
+def verif_coords(tab):
+    """Fonction permettant de vérifier que le placement demandé est valide.
+
+    """
+    if tab[0] not in ("gauche", "centre", "droite") or tab[1] not in ("bas", "centre", "haut"):
+        return False
+
+    return True
+
+def position_rel(tab, image):
+    """Fonction transformant un positionnement relatif en positionnement
+    par coordonnées absolues
+
+    """
+    coords = [0, 0]
+    if tab[0] == "gauche":
+        coords[0] = 5
+    if tab[0] == "centre":
+        coords[0] = image.taille[0] // 2
+    if tab[0] == "droite":
+        coords[0] = image.taille[0] - 5
+    if tab[1] == "bas":
+        coords[1] = image.taille[1] - 5
+    if tab[1] == "centre":
+        coords[1] = image.taille[1] // 2
+    if tab[1] == "haut":
+        coords[1] = 5
+
+    return coords

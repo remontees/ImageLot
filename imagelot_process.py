@@ -9,6 +9,7 @@ import sys
 import threading
 import time
 from photo import Photo
+from utils import verif_coords
 
 def process_json(json_file):
     """
@@ -17,18 +18,17 @@ def process_json(json_file):
     try:
         parameters = json.loads(json_file.read())
     except json.JSONDecodeError:
-        sys.stderr.write("Impossible d'extraire les paramètres\
-         du fichier {}.\n".format(json_file.name))
+        sys.stderr.write("Impossible de lire les paramètres {}.\n".format(json_file.name))
         sys.exit(1)
 
-    if "copyright" in parameters and \
-       "text" in parameters["copyright"] and \
-       "font" in parameters["copyright"] and \
-       "color" in parameters["copyright"] and \
-       "coords" in parameters["copyright"]:
-        if parameters["copyright"]["coords"][0] not in ("gauche", "centre", "droite") or \
-           parameters["copyright"]["coords"][1] not in ("bas", "centre", "haut"):
+    if "copyright" in parameters and "coords" in parameters["copyright"]:
+        if not verif_coords(parameters["copyright"]["coords"]):
             sys.stderr.write("Positionnement du copyright invalide.\n")
+            sys.exit(1)
+
+    if "img_copyright" in parameters and "coords" in parameters["watermark"]:
+        if not verif_coords(parameters["watermark"]["coords"]):
+            sys.stderr.write("Positionnement du watermark invalide.\n")
             sys.exit(1)
 
     return parameters
@@ -56,7 +56,12 @@ def traitement(url_photo, parameters, dest):
         and "color" in parameters["border"]:
         file.ajouter_bordure(parameters["border"]["width"], parameters["border"]["color"])
 
+    if "watermark" in parameters and \
+       "url" in parameters["watermark"] and "coords" in parameters["watermark"]:
+        file.ajouter_logo(parameters["watermark"]["url"], parameters["watermark"]["coords"])
+
     file.sauvegarder()
+
 
 def batch_processing(files, parameters, dest):
     """
