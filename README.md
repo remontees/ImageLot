@@ -20,6 +20,10 @@ Permet par ligne de commande (puis interface graphique) de faire différentes op
 * Ajout de textes
 * Ajout d'images (logos) en watermark
 
+### Problèmes non-résolus
+
+* Trouver l'URL d'une police d'écriture avec `QFont` ou `QFontInfo` pour pouvoir réutiliser la police d'écriture avec Pillow… Si vous savez faire, merci de me contacter à remontees<at>free.fr !! :-)
+
 Installation
 ------------
 

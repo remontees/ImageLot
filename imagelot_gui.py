@@ -9,11 +9,11 @@ Dépendances : librairie PyQt, json
 """
 import sys
 import json
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QFontInfo
 from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QHBoxLayout, QWidget, \
-                            QFormLayout, QPushButton, QLineEdit, QFileDialog, QColorDialog, \
+                            QFormLayout, QPushButton, QFontDialog, QFileDialog, QColorDialog, \
                             QSpinBox, QCheckBox, QAction, QLabel, QFrame, QMessageBox,\
-                            QErrorMessage, qApp
+                            QComboBox, QErrorMessage, QLineEdit, qApp
 from utils import pretty_list
 from imagelot_process import batch_processing
 
@@ -28,7 +28,10 @@ class Form(QWidget):
         super().__init__()
         self.files = []
         self.border_color = QColor(0, 0, 0)
+        self.text_color = QColor(0, 0, 0)
         self.border_width = 1
+        self.font_editor = None
+        self.url_watermark = ""
         self.parameters = {} # Ce qui contiendra les paramètres à exporter
         self.dest = ""
         self.run_main()
@@ -42,6 +45,16 @@ class Form(QWidget):
 
         self.files = file_dialog[0]
         self.line_img.setText(pretty_list(file_dialog[0]))
+
+    def show_file_dialog(self):
+        """ Affichage de la fenêtre de sélection du watermark
+
+        """
+        file_dialog = QFileDialog().getOpenFileName(self, "Choisir une image",\
+                                                     "", "Photos (*.jpg *.png *.gif)")
+
+        self.url_watermark = file_dialog[0]
+        self.line_watermark.setText(file_dialog[0])
 
     def show_directory_dialog(self):
         """ Affichage de la fenêtre de sélection des photos à traiter
@@ -65,11 +78,30 @@ class Form(QWidget):
         if self.border_color.isValid():
             self.color_btn.setStyleSheet("QWidget { background-color: %s }"% self.border_color.name())
 
+    def show_textcolor_dialog(self):
+        """ Affichage de la fenêtre de sélection de la couleur du texte
+
+        """
+        self.text_color = QColorDialog().getColor()
+
+        if self.text_color.isValid():
+            self.color_btn_txt.setStyleSheet("QWidget { background-color: %s }"% self.text_color.name())
+
+    def show_font_dialog(self):
+        """ Affichage de la fenêtre de mise en forme du texte
+
+        """
+        self.font_editor, ok = QFontDialog().getFont()
+
+        if ok:
+            self.font_label.setText(self.font_editor.family())
+            self.font_label.setFont(self.font_editor)
+
     def disable_border(self):
         """ Choisit ou non de rendre inactif la partie "choix de bordure"
 
         """
-        if self.is_border.isChecked():
+        if self.set_border.isChecked():
             self.border_width.setDisabled(False)
             self.color_btn.setDisabled(False)
         else:
@@ -80,12 +112,44 @@ class Form(QWidget):
         """ Choisit ou non de rendre inactif la partie "redimensionnement"
 
         """
-        if self.is_redim.isChecked():
+        if self.set_redim.isChecked():
             self.width.setDisabled(False)
             self.height.setDisabled(False)
         else:
             self.width.setDisabled(True)
             self.height.setDisabled(True)
+
+    def disable_copyright(self):
+        """ Choisit ou non de rendre inactif la partie "copyright"
+
+        """
+        if self.set_copyright.isChecked():
+            self.text_copyright.setDisabled(False)
+            self.font_button.setDisabled(False)
+            self.color_btn_txt.setDisabled(False)
+            self.comboh_text.setDisabled(False)
+            self.combov_text.setDisabled(False)
+        else:
+            self.text_copyright.setDisabled(True)
+            self.font_button.setDisabled(True)
+            self.color_btn_txt.setDisabled(True)
+            self.comboh_text.setDisabled(True)
+            self.combov_text.setDisabled(True)
+
+    def disable_watermark(self):
+        """ Choisit ou non de rendre inactif la partie "watermark"
+
+        """
+        if self.set_watermark.isChecked():
+            self.comboh_watermark.setDisabled(False)
+            self.combov_watermark.setDisabled(False)
+            self.line_watermark.setDisabled(False)
+            self.browse_watermark_button.setDisabled(False)
+        else:
+            self.comboh_watermark.setDisabled(True)
+            self.combov_watermark.setDisabled(True)
+            self.line_watermark.setDisabled(True)
+            self.browse_watermark_button.setDisabled(True)
 
     def process_form(self):
         """ Effectue le chargement des données du formulaire puis l'exécution
@@ -106,7 +170,7 @@ class Form(QWidget):
             errorbox.exec_()
             return
 
-        if self.is_border.isChecked():
+        if self.set_border.isChecked():
             self.parameters["border"] = {}
             self.parameters["border"]["color"] = self.border_color.name()
             self.parameters["border"]["width"] = int(self.border_width.value())
@@ -114,11 +178,69 @@ class Form(QWidget):
             if "border" in self.parameters:
                 del self.parameters["border"]
 
-        if self.is_redim.isChecked():
+        if self.set_redim.isChecked():
             self.parameters["size"] = [self.width.value(), self.height.value()]
         else:
             if "size" in self.parameters:
                 del self.parameters["size"]
+
+        if self.set_copyright.isChecked():
+            self.parameters["copyright"] = {}
+            self.parameters["copyright"]["text"] = self.text_copyright.text()
+            self.parameters["copyright"]["font"] = [QFontInfo(self.font_editor).family(),
+                                                    self.font_editor.pointSize()]
+
+            # Spécification des positionnements
+            self.parameters["copyright"]["coords"] = [None, None]
+
+            if self.comboh_text.currentText() == "À gauche":
+                self.parameters["copyright"]["coords"][0] = "gauche"
+            elif self.comboh_text.currentText() == "Centré":
+                self.parameters["copyright"]["coords"][0] = "centre"
+            else:
+                self.parameters["copyright"]["coords"][0] = "droite"
+
+            if self.combov_text.currentText() == "En haut":
+                self.parameters["copyright"]["coords"][1] = "haut"
+            elif self.combov_text.currentText() == "Centré":
+                self.parameters["copyright"]["coords"][1] = "centre"
+            else:
+                self.parameters["copyright"]["coords"][1] = "bas"
+
+            self.parameters["copyright"]["color"] = self.text_color.name()
+        else:
+            if "copyright" in self.parameters:
+                del self.parameters["copyright"]
+
+        if self.set_watermark.isChecked():
+            self.parameters["watermark"] = {}
+            self.parameters["watermark"]["url"] = self.url_watermark
+
+            # Spécification des positionnements
+            self.parameters["watermark"]["coords"] = [None, None]
+
+            if self.comboh_watermark.currentText() == "À gauche":
+                self.parameters["watermark"]["coords"][0] = "gauche"
+            elif self.comboh_watermark.currentText() == "Centré":
+                self.parameters["watermark"]["coords"][0] = "centre"
+            else:
+                self.parameters["watermark"]["coords"][0] = "droite"
+
+            if self.combov_watermark.currentText() == "En haut":
+                self.parameters["watermark"]["coords"][1] = "haut"
+            elif self.combov_watermark.currentText() == "Centré":
+                self.parameters["watermark"]["coords"][1] = "centre"
+            else:
+                self.parameters["watermark"]["coords"][1] = "bas"
+        else:
+            if "watermark" in self.parameters:
+                del self.parameters["watermark"]
+
+        # Enregistrement des paramètres pour une prochaine exécution
+        with open("parameters.json", "w") as parameters_file:
+            parameters_file.write(self.get_parameters_json())
+
+        # Traitement par lot
 
         result = batch_processing(self.files, self.parameters, self.dest)
 
@@ -154,15 +276,11 @@ class Form(QWidget):
 
         form_layout.addRow(separateur1)
 
-        self.is_redim = QCheckBox()
-        self.is_redim.stateChanged.connect(self.disable_redim)
-        form_layout.addRow("&Redimensionner :", self.is_redim)
+        self.set_redim = QCheckBox()
+        self.set_redim.stateChanged.connect(self.disable_redim)
+        form_layout.addRow("&Redimensionner :", self.set_redim)
 
         ## REDIMENSIONNEMENT
-
-        separateur2 = QFrame()
-        separateur2.setFrameStyle(QFrame.HLine | QFrame.Raised)
-        form_layout.addRow(separateur2)
 
         self.width = QSpinBox()
         self.width.setRange(1, 50000)
@@ -176,14 +294,13 @@ class Form(QWidget):
         form_layout.addRow("N&ouvelle hauteur (format \"portrait\") :", self.height)
 
         ## BORDURES
+        separateur2 = QFrame()
+        separateur2.setFrameStyle(QFrame.HLine | QFrame.Raised)
+        form_layout.addRow(separateur2)
 
-        separateur3 = QFrame()
-        separateur3.setFrameStyle(QFrame.HLine | QFrame.Raised)
-        form_layout.addRow(separateur3)
-
-        self.is_border = QCheckBox()
-        self.is_border.stateChanged.connect(self.disable_border)
-        form_layout.addRow("&Ajouter une bordure :", self.is_border)
+        self.set_border = QCheckBox()
+        self.set_border.stateChanged.connect(self.disable_border)
+        form_layout.addRow("&Ajouter une bordure :", self.set_border)
 
         self.border_width = QSpinBox()
         self.border_width.setMinimum(1)
@@ -198,11 +315,100 @@ class Form(QWidget):
 
         form_layout.addRow("&Couleur de la bordure :", self.color_btn)
 
-        ## DOSSIER DESTINATION
+        ## COPYRIGHT
+        separateur3 = QFrame()
+        separateur3.setFrameStyle(QFrame.HLine | QFrame.Raised)
+        form_layout.addRow(separateur3)
 
+        self.set_copyright = QCheckBox()
+        self.set_copyright.stateChanged.connect(self.disable_copyright)
+        form_layout.addRow("&Ajouter un copyright :", self.set_copyright)
+
+        self.text_copyright = QLineEdit()
+        form_layout.addRow("&Texte :", self.text_copyright)
+        self.text_copyright.setDisabled(True)
+
+        font_widget = QWidget()
+        hbox_font = QHBoxLayout()
+        hbox_font.addWidget(QLabel("Mise en forme :"))
+        self.font_label = QLabel("Pas de mise en forme")
+        self.font_button = QPushButton("Édition")
+        hbox_font.addWidget(self.font_label)
+        hbox_font.addWidget(self.font_button)
+
+        self.font_button.clicked.connect(self.show_font_dialog)
+        font_widget.setLayout(hbox_font)
+        self.font_button.setDisabled(True)
+        form_layout.addRow(font_widget)
+
+        self.color_btn_txt = QPushButton()
+        self.color_btn_txt.clicked.connect(self.show_textcolor_dialog)
+        self.color_btn_txt.setStyleSheet("QWidget { background-color: %s }" % self.text_color.name())
+        self.color_btn_txt.setDisabled(True)
+
+        form_layout.addRow("&Couleur du texte :", self.color_btn_txt)
+
+        self.comboh_text = QComboBox()
+        self.comboh_text.addItem("À gauche")
+        self.comboh_text.addItem("Centré")
+        self.comboh_text.addItem("À droite")
+        self.comboh_text.setDisabled(True)
+
+        form_layout.addRow("&Positionnement horizontal :", self.comboh_text)
+
+        self.combov_text = QComboBox()
+        self.combov_text.addItem("En haut")
+        self.combov_text.addItem("Centré")
+        self.combov_text.addItem("En bas")
+        self.combov_text.setDisabled(True)
+
+        form_layout.addRow("&Positionnement vertical :", self.combov_text)
+
+        ## AJOUTER WATERMARK
         separateur4 = QFrame()
         separateur4.setFrameStyle(QFrame.HLine | QFrame.Raised)
         form_layout.addRow(separateur4)
+
+        self.set_watermark = QCheckBox()
+        self.set_watermark.stateChanged.connect(self.disable_watermark)
+        form_layout.addRow("&Ajouter un watermark :", self.set_watermark)
+
+        watermark_widget = QWidget()
+        hbox_img_watermark = QHBoxLayout()
+        hbox_img_watermark.addWidget(QLabel("Watermark :"))
+        self.line_watermark = QLineEdit()
+        self.line_watermark.setReadOnly(True)
+        self.browse_watermark_button = QPushButton("&Parcourir...")
+        hbox_img_watermark.addWidget(self.line_watermark)
+        hbox_img_watermark.addWidget(self.browse_watermark_button)
+
+        self.browse_watermark_button.clicked.connect(self.show_file_dialog)
+        watermark_widget.setLayout(hbox_img_watermark)
+        self.line_watermark.setDisabled(True)
+        self.browse_watermark_button.setDisabled(True)
+
+        form_layout.addRow(watermark_widget)
+
+        self.comboh_watermark = QComboBox()
+        self.comboh_watermark.addItem("À gauche")
+        self.comboh_watermark.addItem("Centré")
+        self.comboh_watermark.addItem("À droite")
+        self.comboh_watermark.setDisabled(True)
+
+        form_layout.addRow("&Positionnement horizontal :", self.comboh_watermark)
+
+        self.combov_watermark = QComboBox()
+        self.combov_watermark.addItem("En haut")
+        self.combov_watermark.addItem("Centré")
+        self.combov_watermark.addItem("En bas")
+        self.combov_watermark.setDisabled(True)
+
+        form_layout.addRow("&Positionnement vertical :", self.combov_watermark)
+
+        ## DOSSIER DESTINATION
+        separateur5 = QFrame()
+        separateur5.setFrameStyle(QFrame.HLine | QFrame.Raised)
+        form_layout.addRow(separateur5)
 
         dest_widget = QWidget()
         hbox_dest = QHBoxLayout()
@@ -230,7 +436,7 @@ class Form(QWidget):
         """ Retourne les paramètres du traitement par lot au format JSON.
 
         """
-        return json.dumps(self.parameters)
+        return json.dumps(self.parameters, sort_keys=True, indent=4)
 
 
 class Fenetre(QMainWindow):
@@ -274,7 +480,7 @@ class Fenetre(QMainWindow):
 
         self.setCentralWidget(form_widget)
 
-        self.setGeometry(300, 300, 500, 250)
+        self.setGeometry(300, 300, 700, 400)
         self.setWindowTitle("Traitement par lot - ImageLot")
 
         self.show()

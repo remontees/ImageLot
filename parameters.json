@@ -1,13 +1,22 @@
 {
-    "size": [900, 900],
     "border": {
         "color": "black",
         "width": 3
     },
     "copyright": {
-        "text": "© 2019 - remontees",
-        "font": ["Ubuntu-R", 18],
-        "coords": ["gauche", "bas"],
-        "color": "black"
-    }
+        "color": "black",
+        "coords": [
+            "gauche",
+            "bas"
+        ],
+        "font": [
+            "Ubuntu-R",
+            16
+        ],
+        "text": "\u00a9 <année> - <pseudo>"
+    },
+    "size": [
+        900,
+        900
+    ],
 }
