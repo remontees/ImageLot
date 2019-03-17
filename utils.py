@@ -28,13 +28,13 @@ def position_rel(tab, image):
     """
     coords = [0, 0]
     if tab[0] == "gauche":
-        coords[0] = 5
+        coords[0] = 8
     if tab[0] == "centre":
         coords[0] = image.taille[0] // 2
     if tab[0] == "droite":
         coords[0] = image.taille[0] - 5
     if tab[1] == "bas":
-        coords[1] = image.taille[1] - 5
+        coords[1] = image.taille[1] - 10
     if tab[1] == "centre":
         coords[1] = image.taille[1] // 2
     if tab[1] == "haut":

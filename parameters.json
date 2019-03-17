@@ -10,13 +10,13 @@
             "bas"
         ],
         "font": [
-            "Ubuntu-R",
-            16
+            "Ubuntu-M",
+            21
         ],
-        "text": "\u00a9 <année> - <pseudo>"
+        "text": "© 2019 - remontees"
     },
     "size": [
         900,
         900
-    ],
+    ]
 }
